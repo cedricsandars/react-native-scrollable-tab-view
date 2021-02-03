@@ -32,10 +32,9 @@ const ScrollableTabView = createReactClass({
     ScrollableTabBar,
   },
   scrollOnMountCalled: false,
-  tabWillChangeWithoutGesture: false,
 
   propTypes: {
-    tabBarPosition: PropTypes.oneOf(['top', 'bottom', 'overlayTop', 'overlayBottom', ]),
+    tabBarPosition: PropTypes.oneOf([ 'bottom','top', 'overlayTop', 'overlayBottom', ]),
     initialPage: PropTypes.number,
     page: PropTypes.number,
     onChangeTab: PropTypes.func,
@@ -55,7 +54,7 @@ const ScrollableTabView = createReactClass({
 
   getDefaultProps() {
     return {
-      tabBarPosition: 'top',
+      tabBarPosition: 'bottom',
       initialPage: 0,
       page: -1,
       onChangeTab: () => {},
@@ -138,15 +137,14 @@ const ScrollableTabView = createReactClass({
     if (Platform.OS === 'ios') {
       const offset = pageNumber * this.state.containerWidth;
       if (this.scrollView) {
-        this.scrollView.scrollTo({x: offset, y: 0, animated: !this.props.scrollWithoutAnimation, });
+        this.scrollView.getNode().scrollTo({x: offset, y: 0, animated: !this.props.scrollWithoutAnimation, });
       }
     } else {
       if (this.scrollView) {
-        this.tabWillChangeWithoutGesture = true;
         if (this.props.scrollWithoutAnimation) {
-          this.scrollView.setPageWithoutAnimation(pageNumber);
+          this.scrollView.getNode().setPageWithoutAnimation(pageNumber);
         } else {
-          this.scrollView.setPage(pageNumber);
+          this.scrollView.getNode().setPage(pageNumber);
         }
       }
     }
@@ -307,11 +305,10 @@ const ScrollableTabView = createReactClass({
     }
 
     const currentPage = this.state.currentPage;
-    !this.tabWillChangeWithoutGesture && this.updateSceneKeys({
+    this.updateSceneKeys({
       page: localNextPage,
       callback: this._onChangeTab.bind(this, currentPage, localNextPage),
     });
-    this.tabWillChangeWithoutGesture = false;
   },
 
   _onChangeTab(prevPage, currentPage) {
